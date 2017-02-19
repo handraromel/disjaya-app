@@ -1,0 +1,39 @@
+{% extends 'tagihan/base.html' %}
+{% block anggaran_active %}active{% endblock %}
+{% load humanize %}
+{% block body %}
+<div class="albums-container container-fluid">
+
+    <!-- Albums -->
+    <div class="row">
+        <div class="col-sm-12">
+          {% if perms.tagihan.is_administration %}
+            <h3 style="text-align:center;">DATA PEMBAYARAN BAGIAN ADMINISTRASI</bold></h3><br>
+          {% elif perms.tagihan.is_keuangan %}
+            <h3 style="text-align:center;">VERIFIKASI DATA BAGIAN KEUANGAN</bold></h3><br>
+          {% endif %}
+        </div>
+        {% if anggaran %}
+        <div class="col-sm-12">
+            {% for a in anggaran %}
+              <a href="{% url 'tagihan:detail' a.id %}" class="btn btn-primary btn-lg btn-block" role="button">Data Anggaran {{ a.amount_date|date:"d M Y" }} </a>
+                {% cycle '' '' '' '' '' '<div class="clearfix visible-lg"></div>' %}
+            {% endfor %}
+        </div>
+        {% else %}
+            <div class="col-sm-12">
+                <br>
+                <a href="{% url 'tagihan:create_anggaran' %}">
+                  <div class="caption text-center">
+                    <button type="button" class="btn btn-success">
+                        <span class="glyphicon glyphicon-plus"></span>&nbsp; Tambah Data Anggaran
+                    </button>
+                  </div>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+
+</div>
+{% endblock %}

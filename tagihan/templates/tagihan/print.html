@@ -1,0 +1,78 @@
+{% extends 'tagihan/base.html' %}
+{% load humanize %}
+{% block title %}Print{% endblock %}
+{% block anggaran_active %}active{% endblock %}
+
+{% block body %}
+
+<h3 style="text-align:center;">MONITORING PEMBAYARAN TAGIHAN JAMINAN KESEHATAN</h3>
+<h4 style="text-align:center;">PT.PLN (PERSERO) DISTRIBUSI JAKARTA RAYA</h4><br>
+
+<table class="table table-responsive table-bordered table-striped">
+    <thead>
+    <tr>
+        <th width="25%">Nama Provider</th>
+        <th width="10%">Nomor Vendor</th>
+        <th width="10%">Nomor Tagihan</th>
+        <th width="10%">Nomor Kuitansi</th>
+        <th width="10%">Pembayaran Pegawai</th>
+        <th width="10%">Pembayaran Pensiun</th>
+        <th width="10%">Tanggal Pembayaran</th>
+        <th width="10%">Pembayaran</th>
+        <th width="15%">Tanggal Verifikasi</th>
+        <th width="20%">Keterangan/Bermasalah</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for pembayaran in anggaran.pembayaran_set.all %}
+        <tr>
+            <td>{{ pembayaran.provider_name }}</td>
+            <td>{{ pembayaran.vendor_number }}</td>
+            <td>{{ pembayaran.bill_number }}</td>
+            <td>{{ pembayaran.receipt_number }}</td>
+            <td>Rp.{{ pembayaran.employee_payment|intcomma }},-</td>
+            <td>Rp.{{ pembayaran.pension_payment|intcomma }},-</td>
+            <td>{{ pembayaran.payment_date|date:"d M Y" }}</td>
+            <td>
+              {% if pembayaran.is_verified %}
+              Diverifikasi
+              {% else %}
+              Belum Verifikasi/Bermasalah
+              {% endif %}
+            </td>
+            <td>{{ pembayaran.verification_date|date:"d M Y" }}</td>
+            <td>{{ pembayaran.is_problem }}</td>
+        </tr>
+    {% endfor %}
+    <tr>
+      <th>Sub Total</th>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>Rp.{{ total_emp_payment.total_emp|intcomma }},-</td>
+      <td>Rp.{{ total_pension_payment.total_pension|intcomma }},-</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>Total</th>
+      <td></td>
+      <td></td>
+      <td></td>
+      <th style="text-align:center;" colspan="2">Rp.{{ total_all|intcomma }},-</th>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    </tbody>
+    <div class="text-right">
+        <h4 style="color:Red;"> Sisa Anggaran : Rp.{{ rest_anggaran|intcomma }},- </h4>
+        <h4 style="color:Blue;"> Nominal Anggaran : Rp.{{ anggaran.money_amount|intcomma }},- </h4>
+    </div>
+</table>
+{% endblock %}

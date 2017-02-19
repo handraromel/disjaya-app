@@ -1,0 +1,29 @@
+{% extends 'tagihan/base.html' %}
+{% block title %}Tambah Anggaran{% endblock %}
+{% block anggaran_active %}active{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+
+    <div class="row">
+
+        <div class="col-sm-12 col-md-7 col-centered">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h3 style="text-align:center;">Tambah Anggaran Tahunan</h3><br>
+                    <form style="margin-left:120px;" class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% include 'tagihan/form_template.html' %}
+                        <div class="form-group"><br>
+                            <div class="col-lg-offset-2 col-lg-8 text-right">
+                                <button type="submit" class="btn btn-success">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

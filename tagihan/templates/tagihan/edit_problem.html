@@ -1,0 +1,30 @@
+{% extends 'tagihan/base.html' %}
+{% block title %}Data Bermalasah{% endblock %}
+{% block anggaran_active %}active{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+
+    <div class="row">
+
+        <div class="col-sm-12 col-md-5 col-centered">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h3 style="text-align:center;">Tambahkan Masalah Pembayaran</h3><br>
+                    <form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% include 'tagihan/form_template.html' %}
+                        <div class="form-group">
+                            <div class="text-right col-sm-offset-2 col-sm-8">
+                                <button type="submit" class="btn btn-success" value="update">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

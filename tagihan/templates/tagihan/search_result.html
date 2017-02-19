@@ -1,0 +1,122 @@
+{% extends 'tagihan/base.html' %}
+{% load humanize %}
+{% block title %}Details{% endblock %}
+{% block anggaran_active %}active{% endblock %}
+
+{% block body %}
+<ul class="nav nav-pills" style="margin-bottom: 10px;margin-left: 10px;">
+    <li role="presentation" class="active"><a href="{% url 'tagihan:detail' anggaran.id %}">Data Pembayaran</a></li>
+    {% if perms.tagihan.change_pembayaran %}
+    <li role="presentation"><a href="{% url 'tagihan:create_pembayaran' anggaran.id %}">Tambah Data</a></li>
+    {% endif %}
+</ul>
+<div class="container-fluid songs-container">
+{% if pembayaran_list.count > 0 %}
+    <div class="row">
+        <!-- Right Info -->
+        <div class="col-xs-18 col-md-14">
+
+            <div class="panel panel-info class">
+                <div class="panel-body">
+
+                    <h3 style="text-align:center;">Hasil Pencarian</h3><br>
+
+                    <table class="table table-responsive table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th width="25%">Nama Provider</th>
+                            <th width="10%">Nomor Vendor</th>
+                            <th width="10%">Nomor Tagihan</th>
+                            <th width="10%">Nomor Kuitansi</th>
+                            <th width="10%">Pembayaran Pegawai</th>
+                            <th width="10%">Pembayaran Pensiun</th>
+                            <th width="10%">Tanggal Pembayaran</th>
+                            <th width="10%">Pembayaran</th>
+                            <th width="15%">Tanggal Verifikasi</th>
+                            <th width="20%">Keterangan/Bermasalah</th>
+                            <th width="10%">Edit</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for pembayaran in pembayaran_list %}
+                            <tr>
+                                <td>{{ pembayaran.provider_name }}</td>
+                                <td>{{ pembayaran.vendor_number }}</td>
+                                <td>{{ pembayaran.bill_number }}</td>
+                                <td>{{ pembayaran.receipt_number }}</td>
+                                <td>
+                                  Rp.{{ pembayaran.employee_payment|default_if_none:'0'|intcomma }},-
+                                </td>
+                                <td>
+                                  Rp.{{ pembayaran.pension_payment|default_if_none:'0'|intcomma }},-
+                                </td>
+                                <td>{{ pembayaran.payment_date|date:"d M Y" }}</td>
+                                <td>
+                                  {% if perms.tagihan.change_is_verified %}
+                                    <a href="{% url 'tagihan:verified' pembayaran.id %}" class="btn-favorite">
+                                      <span class="glyphicon glyphicon-ok {% if pembayaran.is_verified %}active{% endif %}"></span>
+                                    </a>
+                                  {% elif perms.tagihan.view_is_verified %}
+                                    <span class="glyphicon glyphicon-ok {% if pembayaran.is_verified %}active{% endif %} align-middle"></span>
+                                  {% endif %}
+                                </td>
+                                <td>{{ pembayaran.verification_date|date:"d M Y" }}</td>
+                                <td>{{ pembayaran.is_problem }}</td>
+                                <td>
+                                  {% if perms.tagihan.change_pembayaran %}
+                                    <a class="btn btn-default" href="{% url 'tagihan:edit_pembayaran' anggaran.id pembayaran.id %}"><span class="glyphicon glyphicon-pencil"></span></a>
+                                  {% elif perms.tagihan.fill_is_problem %}
+                                    <a class="btn btn-default" href="{% url 'tagihan:edit_problem' anggaran.id pembayaran.id %}"><span class="glyphicon glyphicon-pencil"></span></a>
+                                  {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {% else %}
+                        No data to show, please input your data first.
+                        <tr>
+                          <th>Sub Total</th>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <th>Rp.{{ total_emp_payment.total_emp|intcomma }},-</th>
+                          <th>Rp.{{ total_pension_payment.total_pension|intcomma }},-</th>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                        </tr>
+                        <tr>
+                          <th>Total</th>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <th colspan="2">Rp.{{ total_all|intcomma }},-</th>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                        </tr>
+                  </tbody>
+                </table>
+
+                  {% if perms.tagihan.change_is_verified %}
+                  <div class="caption text-right">
+                      <button onclick="Reload()" class="btn btn-success btn-lg">VERIFIKASI</a>
+                  </div>
+                  {% endif %}
+                  {% if perms.tagihan.print_output %}
+                  <div class="caption text-right">
+                      <a href="{% url 'tagihan:print_pdf' anggaran.id %}" class="btn btn-success btn-lg" role="button">Cetak Data</a>
+                  </div>
+                  {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+  {% endif %}
+  </div>
+
+  {% endblock %}

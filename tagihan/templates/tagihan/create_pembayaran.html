@@ -1,0 +1,37 @@
+{% extends 'tagihan/base.html' %}
+{% block title %}Tambah Pembayaran{% endblock %}
+{% block anggaran_active %}active{% endblock %}
+
+{% block body %}
+<ul class="nav nav-pills" style="margin-bottom: 10px;margin-left: 10px">
+    <li role="presentation"><a href="{% url 'tagihan:detail' anggaran.id %}">Data Pembayaran</a></li>
+    <li role="presentation" class="active"><a href="{% url 'tagihan:create_pembayaran' anggaran.id %}">Tambah Data</a></li>
+</ul>
+<div class="container">
+    <div class="row">
+        <!-- Right Info -->
+        <div class="col-sm-10 col-md-14 col-centered">
+
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h3 style="text-align:center;">Tambah Data Pembayaran</h3><br>
+                    <form style="margin-left:200px;"class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input class="form-control input-lg col-xs-4" id="inputlg" type="hidden" name="anggaran" value="{{ anggaran }}">
+                        {% include 'tagihan/form_template.html' %}
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-7 text-right">
+                                <button type="submit" class="btn btn-success">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,147 @@
+{% extends 'tagihan/base.html' %}
+{% load humanize %}
+{% block title %}Details{% endblock %}
+{% block anggaran_active %}active{% endblock %}
+
+{% block body %}
+<ul class="nav nav-pills" style="margin-bottom: 0px;margin-left: 10px;">
+    <li role="presentation" class="active"><a href="{% url 'tagihan:detail' anggaran.id %}">Data Pembayaran</a></li>
+    {% if perms.tagihan.change_pembayaran %}
+    <li role="presentation"><a href="{% url 'tagihan:create_pembayaran' anggaran.id %}">Tambah Data</a></li>
+    {% endif %}
+    <div class="navbar navbar-right" style="margin-right:20px;">
+    <form method='GET' action=''>
+    <input type='text' name='q' placeholder="Search data" value='{{ request.get.q}}'/>
+    <input align="right" type="submit" value="Search"/>
+    </form>
+  </div>
+</ul>
+
+<div class="container-fluid songs-container">
+    <div class="row">
+        <!-- Right Info -->
+        <div class="col-xs-18 col-md-14">
+
+            <div class="panel panel-info class">
+                <div class="panel-body">
+
+                    <h3 style="text-align:center;">MONITORING PEMBAYARAN TAGIHAN JAMINAN KESEHATAN</h3>
+                    <h4 style="text-align:center;">PT.PLN (PERSERO) DISTRIBUSI JAKARTA RAYA</h4><br>
+
+                    <table class="table table-responsive table-striped table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>Nama Provider</th>
+                            <th>Nomor Vendor</th>
+                            <th>Nomor Tagihan</th>
+                            <th>Nomor Kuitansi</th>
+                            <th>Pembayaran Pegawai</th>
+                            <th>Pembayaran Pensiun</th>
+                            <th>Tanggal Pembayaran</th>
+                            <th>Pembayaran</th>
+                            <th>Tanggal Verifikasi</th>
+                            <th>Keterangan/Bermasalah</th>
+                            <th>Edit</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for pembayaran in pembayaran %}
+                            <tr>
+                                <td>{{ pembayaran.provider_name }}</td>
+                                <td>{{ pembayaran.vendor_number }}</td>
+                                <td>{{ pembayaran.bill_number }}</td>
+                                <td>{{ pembayaran.receipt_number }}</td>
+                                <td>
+                                  Rp.{{ pembayaran.employee_payment|default_if_none:'0'|intcomma }},-
+                                </td>
+                                <td>
+                                  Rp.{{ pembayaran.pension_payment|default_if_none:'0'|intcomma }},-
+                                </td>
+                                <td>{{ pembayaran.payment_date|date:"d M Y" }}</td>
+                                <td>
+                                  {% if perms.tagihan.change_is_verified %}
+                                    <a href="{% url 'tagihan:verified' pembayaran.id %}" class="btn-favorite">
+                                      <span class="glyphicon glyphicon-ok {% if pembayaran.is_verified %}active{% endif %}"></span>
+                                    </a>
+                                  {% elif perms.tagihan.view_is_verified %}
+                                    <span class="glyphicon glyphicon-ok {% if pembayaran.is_verified %}active{% endif %} align-middle"></span>
+                                  {% endif %}
+                                </td>
+                                <td>{{ pembayaran.verification_date|date:"d M Y" }}</td>
+                                <td>{{ pembayaran.is_problem }}</td>
+                                <td>
+                                  {% if perms.tagihan.change_pembayaran %}
+                                    <a class="btn btn-default" href="{% url 'tagihan:edit_pembayaran' anggaran.id pembayaran.id %}"><span class="glyphicon glyphicon-pencil"></span></a>
+                                  {% elif perms.tagihan.fill_is_problem %}
+                                    <a class="btn btn-default" href="{% url 'tagihan:edit_problem' anggaran.id pembayaran.id %}"><span class="glyphicon glyphicon-pencil"></span></a>
+                                  {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                          <th>Sub Total</th>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <th>Rp.{{ total_emp_payment.total_emp|intcomma }},-</th>
+                          <th>Rp.{{ total_pension_payment.total_pension|intcomma }},-</th>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                        </tr>
+                        <tr>
+                          <th>Total</th>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <th colspan="2">Rp.{{ total_all|intcomma }},-</th>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                        </tr>
+                  </tbody>
+                </table>
+
+                <div class="pagination">
+                  <span class="step-links">
+                    {% if pembayaran.has_previous %}
+                      <a href="?page={{ pembayaran.previous_page_number }}">previous</a>
+                    {% endif %}
+
+                    <span class="current">
+                      <h5>Page {{ pembayaran.number }} of {{ pembayaran.paginator.num_pages }}</h5>
+                    </span>
+
+                    {% if pembayaran.has_next %}
+                      <a href="?page={{ pembayaran.next_page_number }}">Next</a>
+                    {% endif %}
+                  </span>
+                </div>
+
+                  <div class="caption text-right">
+                      <h4 style="color:Red;"> Sisa Anggaran : Rp.{{ rest_anggaran|intcomma }},- </h4>
+                      <h4 style="color:Blue;"> Nominal Anggaran : Rp.{{ anggaran.money_amount|intcomma }},- </h4>
+                  </div><br>
+                  {% if perms.tagihan.change_is_verified %}
+                  <div class="caption text-right">
+                      <button onclick="Reload()" class="btn btn-success btn-lg">VERIFIKASI</a>
+                  </div>
+                  {% endif %}
+                  {% if perms.tagihan.print_output %}
+                  <div class="caption text-right">
+                      <a href="{% url 'tagihan:print_pdf' anggaran.id %}" class="btn btn-success btn-lg" role="button">Cetak Data</a>
+                  </div>
+                  {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
